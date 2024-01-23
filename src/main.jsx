@@ -7,6 +7,8 @@ import Homepage from "./Pages/HomePage/Homepage";
 import Signup from "./Pages/SignUp/Signup";
 import CustomAuth from "./Auth/CustomAuth";
 import SignIn from "./Pages/SignIn/SignIn";
+import Dashboard from "./Pages/UserPage/Dashboard";
+import AddHouse from "./Pages/UserPage/HouseOwner/AddHouse/AddHouse";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,6 +26,20 @@ const router = createBrowserRouter([
         path: "/signin",
         element: <SignIn></SignIn>,
       },
+      {
+        path:"/dashboard",
+        element:<Dashboard></Dashboard>,
+        children:[
+          {
+            path:"/dashboard/myhouses",
+            element: <p>Hello</p> ,
+          },
+          {
+            path:"/dashboard/addhouse",
+            element: <AddHouse></AddHouse>
+          }
+        ]
+      }
     ],
   },
 ]);

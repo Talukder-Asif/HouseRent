@@ -6,11 +6,12 @@ import Swal from "sweetalert2";
 export const AuthContext = createContext(null);
 const CustomAuth = ({ children }) => {
 const [loading, setloading] = useState(true);
+const [relode, setReload] = useState(false);
 const [User, setUser] = useState(null);
 const setLocalStore =(email, role) =>{
     localStorage.setItem('email', email);
     localStorage.setItem('role', role);
-    window.location.href = "/";
+    window.location.href = "/dashboard/profile";
 }
       // Create an Account with Email and Password
   const createUser = (email, name, phone, password, role) => {
@@ -48,7 +49,7 @@ const setLocalStore =(email, role) =>{
         const userRole = localStorage.getItem('role');
         setloading(false);
         userEmail? setUser({userEmail, userRole}) : setUser(false);
-      }, []);
+      }, [relode]);
 
 
 
@@ -79,6 +80,7 @@ const setLocalStore =(email, role) =>{
 
   // Logout
   const logout = () => {
+    setReload(!relode)
     localStorage.clear();
   }
 

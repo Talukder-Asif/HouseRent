@@ -11,14 +11,15 @@ const Navbar = () => {
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#1f2937",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, Log Out"
     }).then((result) => {
-      logout();
       if (result.isConfirmed) {
+        logout();
         Swal.fire({
           title: "Logout!",
+          confirmButtonColor: "#eb6753",
           text: "You have been Logouted.",
           icon: "success"
         });
@@ -28,9 +29,11 @@ const Navbar = () => {
     const manuItem = (
         <>
           <li><a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href={"/"}>Houses</a></li>
+          <li>{User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href='/dashboard/myhouses'>DashBoard</a>:null}</li>
           <li>{User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" onClick={handleLogout}>Log Out</a>: <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href={"/signin"}>Sign in</a>}</li>
         </>
       );
+
       return (
         <div className='sticky top-0 bg-gray-800 z-50 '>
           <div className="navbar max-w-7xl m-auto px-5 ">
