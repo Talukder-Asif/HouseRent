@@ -28,7 +28,6 @@ const Navbar = () => {
   }
     const manuItem = (
         <>
-          <li><a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href={"/"}>Houses</a></li>
           <li>{User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href='/dashboard/myhouses'>DashBoard</a>:null}</li>
           <li>{User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" onClick={handleLogout}>Log Out</a>: <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href={"/signin"}>Sign in</a>}</li>
         </>

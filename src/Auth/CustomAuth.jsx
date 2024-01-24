@@ -11,7 +11,7 @@ const [User, setUser] = useState(null);
 const setLocalStore =(email, role) =>{
     localStorage.setItem('email', email);
     localStorage.setItem('role', role);
-    window.location.href = "/dashboard/profile";
+    window.location.href = "/dashboard";
 }
       // Create an Account with Email and Password
   const createUser = (email, name, phone, password, role) => {
@@ -21,7 +21,8 @@ const setLocalStore =(email, role) =>{
         email: email,
         phone: phone,
         role: role,
-        password: password
+        password: password,
+        Rent:[]
       }
       axios.post('http://localhost:5000/user', userData)
       .then(res=> res.data.insertedId?

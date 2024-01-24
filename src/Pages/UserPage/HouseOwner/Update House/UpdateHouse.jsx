@@ -1,72 +1,57 @@
-import { useContext } from "react";
-import useAxios from "../../../../Hooks/useAxios";
+
+import { useLoaderData } from "react-router-dom";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
+import { useContext } from "react";
 import { AuthContext } from "../../../../Auth/CustomAuth";
 
-
-
-const AddHouse = () => {
-    const axiosPublic = useAxios();
-    const {User} = useContext(AuthContext);
-
-    const handelAdd = (e) => {
-
-        e.preventDefault();
-        const form = e.target;
-        const phone1 = form.phone.value.slice(0,3);
-        if(phone1==="+88"){
-            const data = {
-                name: form.Name.value,
-                image: form.photoURL.value,
-                address: form.Address.value,
-                city: form.cityName.value,
-                details: form.details.value,
-                bedroom: form.totalBed.value,
-                bathroom: form.totalBath.value,
-                createdBy: User?.userEmail,
-                size: form.totalsize.value,
-                rent: form.rent.value,
-                phone: form.phone.value,
-                Deadline: form.deadline.value,
-                
-              };
-              axiosPublic.post("/addhouse", data).then((res) =>
-                res?.data?.acknowledged
-                  ? Swal.fire({
-                      position: "center",
-                      icon: "success",
-                      title: "Your post successfully added",
-                      showConfirmButton: false,
-                      timer: 1500,
-                    })
-                  : Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: "Something went wrong!",
-                    })
-              );
-        }else{
-            Swal.fire({
-                icon: "error",
-                title: "Invalid country code",
-                text: "Only BD phones are allowed",
-                confirmButtonColor: "#f72c00",
-              })
-        }
+const UpdateHouse = () => {
+  const axiosSecure = useAxiosSecure();
+  const {User} = useContext(AuthContext);
+  const houseData = useLoaderData();
+  const handelUpdate = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      name: form.Name.value,
+      image: form.photoURL.value,
+      address: form.Address.value,
+      city: form.cityName.value,
+      details: form.details.value,
+      bedroom: form.totalBed.value,
+      bathroom: form.totalBath.value,
+      createdBy: User?.userEmail,
+      size: form.totalsize.value,
+      rent: form.rent.value,
+      phone: form.phone.value,
+      Deadline: form.deadline.value,
     };
 
-
-
-
+    axiosSecure.put(`/house/${houseData._id}`, data).then((res) =>
+      res?.data?.acknowledged
+        ? Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Updated Successfully",
+            showConfirmButton: false,
+            timer: 1500,
+          })
+        : Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          })
+    );
+  };
 
   return (
     <div>
       <h3 className=" mb-5 text-3xl md:text-4xl lg:text-5xl text-gray-900  font-bold">
-        Add a House
+        Update House
       </h3>
 
       <div>
-        <form onSubmit={handelAdd}>
+        <form onSubmit={handelUpdate}>
           <div className="grid gap-6 mb-6 md:grid-cols-2">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -76,7 +61,7 @@ const AddHouse = () => {
                 type="text"
                 name="Name"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Give a meaningful name"
+                defaultValue={houseData.name}
                 required
               />
             </div>
@@ -88,6 +73,7 @@ const AddHouse = () => {
                 type="url"
                 name="photoURL"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                defaultValue={houseData.image}
                 required
               />
             </div>
@@ -99,7 +85,7 @@ const AddHouse = () => {
                 type="text"
                 name="Address"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Give full address of the house"
+                defaultValue={houseData.address}
                 required
               />
             </div>
@@ -111,7 +97,7 @@ const AddHouse = () => {
                 type="text"
                 name="cityName"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Give the city name"
+                defaultValue={houseData.city}
                 required
               />
             </div>
@@ -124,7 +110,7 @@ const AddHouse = () => {
                 type="number"
                 name="totalBed"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Amount of total bedroom"
+                defaultValue={houseData.bedroom}
                 required
               />
             </div>
@@ -136,7 +122,7 @@ const AddHouse = () => {
                 type="number"
                 name="totalBath"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Amount of total Bathroom"
+                defaultValue={houseData.bathroom}
                 required
               />
             </div>
@@ -148,7 +134,7 @@ const AddHouse = () => {
                 type="number"
                 name="totalsize"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="In square feet"
+                defaultValue={houseData.size}
                 required
               />
             </div>
@@ -161,6 +147,7 @@ const AddHouse = () => {
                 name="deadline"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 required
+                defaultValue={houseData.Deadline}
               />
             </div>
             <div>
@@ -171,7 +158,7 @@ const AddHouse = () => {
                 name="details"
                 rows="6"
                 className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Write contest details here..."
+                defaultValue={houseData.details}
               ></textarea>
             </div>
             <div>
@@ -183,7 +170,7 @@ const AddHouse = () => {
                   type="number"
                   name="rent"
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="In Taka"
+                  defaultValue={houseData.rent}
                   required
                 ></input>
               </div>
@@ -195,8 +182,7 @@ const AddHouse = () => {
                   type="tel"
                   name="phone"
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  
-                  defaultValue={"+88 0"}
+                  defaultValue={houseData.phone}
                   required
                 ></input>
               </div>
@@ -206,7 +192,7 @@ const AddHouse = () => {
             type="submit"
             className=" text-[#eb6753] border-2 w-full border-[#eb6753] px-4 py-2 md:px-5 md:py-2 font-semibold text-sm md:text-base rounded-md hover:bg-[#eb6753] hover:text-white"
           >
-            Add House
+            Update House
           </button>
         </form>
       </div>
@@ -214,4 +200,4 @@ const AddHouse = () => {
   );
 };
 
-export default AddHouse;
+export default UpdateHouse;

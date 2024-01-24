@@ -9,6 +9,9 @@ import CustomAuth from "./Auth/CustomAuth";
 import SignIn from "./Pages/SignIn/SignIn";
 import Dashboard from "./Pages/UserPage/Dashboard";
 import AddHouse from "./Pages/UserPage/HouseOwner/AddHouse/AddHouse";
+import MyHouse from "./Pages/UserPage/HouseOwner/MyHouse/MyHouse";
+import UpdateHouse from "./Pages/UserPage/HouseOwner/Update House/UpdateHouse";
+import Details from "./Pages/Details/Details";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,16 +30,26 @@ const router = createBrowserRouter([
         element: <SignIn></SignIn>,
       },
       {
+        path:"/details/:id",
+        element: <Details></Details>,
+        loader: ({params})=> fetch(`http://localhost:5000/house/${params.id}`)
+      },
+      {
         path:"/dashboard",
         element:<Dashboard></Dashboard>,
         children:[
           {
             path:"/dashboard/myhouses",
-            element: <p>Hello</p> ,
+            element: <MyHouse></MyHouse> ,
           },
           {
             path:"/dashboard/addhouse",
             element: <AddHouse></AddHouse>
+          },
+          {
+            path:"/dashboard/update/:id",
+            element: <UpdateHouse></UpdateHouse>,
+            loader: ({params})=> fetch(`http://localhost:5000/house/${params.id}`)
           }
         ]
       }
