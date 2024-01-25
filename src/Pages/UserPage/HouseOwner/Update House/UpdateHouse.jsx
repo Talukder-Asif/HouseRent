@@ -1,12 +1,12 @@
 
 import { useLoaderData } from "react-router-dom";
-import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import { useContext } from "react";
 import { AuthContext } from "../../../../Auth/CustomAuth";
+import useAxios from "../../../../Hooks/useAxios";
 
 const UpdateHouse = () => {
-  const axiosSecure = useAxiosSecure();
+  const axiosSecure = useAxios();
   const {User} = useContext(AuthContext);
   const houseData = useLoaderData();
   const handelUpdate = (e) => {

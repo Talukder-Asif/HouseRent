@@ -28,7 +28,7 @@ const SignIn = () => {
       if (!/[!@#$%^&*()_+{}\\[\]:;<>,.?~\\-]/.test(password)) {
         return seterror("Password must contain at least one special character.");
       }
-          axios.post('http://localhost:5000/jwt', email, {withCredentials:true})
+          axios.post('https://house-rent-server-chi.vercel.app/jwt', email, {withCredentials:true})
           .then(res=> console.log(res.data))
           login(email, password)
   

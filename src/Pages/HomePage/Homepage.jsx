@@ -1,17 +1,51 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../Auth/CustomAuth";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { AuthContext } from "/src/Auth/CustomAuth";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import useAxios from "../../Hooks/useAxios";
 
 const Homepage = () => {
   const { User, loading } = useContext(AuthContext);
-  const axiosSecure = useAxiosSecure();
+  const axiosPublic = useAxios();
   const [houseData, sethouseData] = useState([]);
   useEffect(() => {
-    axiosSecure.get(`/houses`).then((res) => {
+    axiosPublic.get(`/houses`).then((res) => {
       res?.data.length > 0 ? sethouseData(res?.data) : null;
     });
-  }, [User?.userEmail, axiosSecure]);
+  }, [User?.userEmail, axiosPublic]);
+
+  // Search
+  const [searchingItem, setsearchingItem] = useState(true);
+  const [searchHouse, setSearchHouse] = useState([]);
+  const [searching, setsearching] = useState(false);
+  const [value, setValue] = useState();
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setValue(e.target.search.value);
+    if (e.target.search.value === "" || e.target.search.value === " ") {
+      setsearching(false);
+    } else {
+      setsearching(true);
+    }
+    axios
+      .get("https://house-rent-server-chi.vercel.app/allhouse/search", {
+        params: {
+          query: e.target.search.value.toLowerCase(),
+        },
+      })
+      .then((response) => {
+        setSearchHouse(response?.data);
+
+        if (response?.data.length === 0) {
+          setsearchingItem(false);
+        } else {
+          setsearchingItem(true);
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching for items:", error);
+      });
+  };
 
   if (loading) {
     return (
@@ -42,55 +76,190 @@ const Homepage = () => {
     );
   } else {
     return (
-      <div className="grid  md:grid-cols-2 lg:grid-cols-3 px-3 gap-3">
-        {houseData?.map((house) => (
-          <div
-            key={house?._id}
-            className="mt-5 mb-5 relative abc bg-gray-200 border border-gray-200 hover:border-[#eb6753] rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
-          >
-            <div className="relative">
-              <img
-                className="p-2 max-h-[200px] w-full"
-                src={house.image}
-                alt="product image"
-              />
+      <div className="max-h-screen">
+        {/* Banner/search */}
+        <div
+          style={{
+            backgroundImage:
+              "url(https://homez-reactjs.ibthemespro.com/assets/home-1-22d28a2d.jpg)",
+          }}
+          className="bg-cover bg-no-repeat  py-10 bg-center "
+        >
+          <div className="top-0 left-0 w-full relative">
+            <div className="max-w-7xl p-5 md:p-10 m-auto md:flex items-center gap-5 ">
+              <div className="md:w-7/12 lg:w-6/12 space-y-5">
+                <p className="text-[#eb6753] text-xl italic">
+                THE BEST WAY TO
+                </p>
+                <h2 className="text-3xl z-0 md:text-5xl text-[#eb6753] font-bold">
+                Find Your Dream Home
+                </h2>
+                <form onSubmit={handleSearch}>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="search"
+                      name="search"
+                      id="default-search"
+                      className="block w-full p-4 pl-10 text-sm text-gray-900 border border-[#eb6753] rounded-lg bg-gray-50  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Search with Contest name..."
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-2.5 bottom-2 focus:ring-4 focus:outline-none focus:ring-[#eb675363] font-medium rounded-lg text-sm px-4 py-2 border-2 border-[#eb6753] text-white bg-[#eb6753] hover:bg-white hover:text-[#eb6753]  dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </form>
+              </div>
 
-              <p className="absolute bottom-4 left-4 bg-white p-1 rounded-md text-sm font-bold">
-                BDT {house.rent} /<span className="text-xs">Month</span>
-              </p>
+              <div className="md:w-5/12 lg:w-6/12"></div>
             </div>
-            <div className="px-5 pb-7 ">
-              <h5 className="text-xl font-semibold text-left tracking-tight text-gray-900 dark:text-white">
-                {house.name}
-              </h5>
+          </div>
+        </div>
 
-              <p className="py-1">{house.address}</p>
+        {/* Search Items */}
+        {searching ? (
+          <div className="mt-16">
+            <div className="text-center pb-7">
+              <h3 className="text-2xl md:text-4xl font-bold">
+                Your Search Result
+              </h3>
+            </div>
+            <div className=" max-w-7xl -mt-10 m-auto px-5">
+              {searchingItem ? (
+                <div className="grid  md:grid-cols-2 lg:grid-cols-3 px-3 gap-3">
+                  {searchHouse?.map((house) => (
+                    <div
+                      key={house?._id}
+                      className="mt-5 mb-5 relative abc bg-gray-200 border border-gray-200 hover:border-[#eb6753] rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      <div className="relative">
+                        <img
+                          className="p-2 max-h-[200px] w-full"
+                          src={house.image}
+                          alt="product image"
+                        />
 
-              <div className="flex items-center justify-between">
-                
-              <span className=" border-2 border-[#eb6753] bg-white text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                        <p className="absolute bottom-4 left-4 bg-white p-1 rounded-md text-sm font-bold">
+                          BDT {house.rent} /
+                          <span className="text-xs">Month</span>
+                        </p>
+                      </div>
+                      <div className="px-5 pb-7 ">
+                        <h5 className="text-xl font-semibold text-left tracking-tight text-gray-900 dark:text-white">
+                          {house.name}
+                        </h5>
+
+                        <p className="py-1">{house.address}</p>
+
+                        <div className="flex items-center justify-between">
+                          <span className=" border-2 border-[#eb6753] bg-white text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                            Bed: {house?.bedroom}
+                          </span>
+                          <span className=" border-2 border-[#eb6753] bg-white text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                            Bath: {house?.bathroom}
+                          </span>
+
+                          <Link to={`/details/${house._id}`}>
+                            <button className=" border-2 border-[#eb6753] text-white bg-[#eb6753] hover:bg-white hover:text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                              Details
+                            </button>
+                          </Link>
+                        </div>
+                        <img
+                          className=" w-10/12 border-none def hidden absolute bottom-0 "
+                          src="https://themeholy.com/wordpress/pizzan/wp-content/themes/pizzan/assets/img/fire.png"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-12 mt-10 border-2 border-black">
+                  <h1 className="text-xl md:text-3xl text-center my-4 font-extrabold dark:text-white">
+                    No Contest found using &quot;{value}&quot;
+                  </h1>
+                </div>
+              )}
+            </div>
+            <div className="text-center"></div>
+          </div>
+        ) : null}
+
+        <div>
+
+        <div className="text-center pt-10 pb-2">
+              <h3 className="text-2xl md:text-4xl font-bold">
+                All Available Houses
+              </h3>
+            </div>
+
+        <div className="grid  md:grid-cols-2 lg:grid-cols-3 px-3 gap-3">
+          {houseData?.map((house) => (
+            <div
+              key={house?._id}
+              className="mt-5 mb-5 relative abc bg-gray-200 border border-gray-200 hover:border-[#eb6753] rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+            >
+              <div className="relative">
+                <img
+                  className="p-2 max-h-[200px] w-full"
+                  src={house.image}
+                  alt="product image"
+                />
+
+                <p className="absolute bottom-4 left-4 bg-white p-1 rounded-md text-sm font-bold">
+                  BDT {house.rent} /<span className="text-xs">Month</span>
+                </p>
+              </div>
+              <div className="px-5 pb-7 ">
+                <h5 className="text-xl font-semibold text-left tracking-tight text-gray-900 dark:text-white">
+                  {house.name}
+                </h5>
+
+                <p className="py-1">{house.address}</p>
+
+                <div className="flex items-center justify-between">
+                  <span className=" border-2 border-[#eb6753] bg-white text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
                     Bed: {house?.bedroom}
                   </span>
-                <span className=" border-2 border-[#eb6753] bg-white text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                  <span className=" border-2 border-[#eb6753] bg-white text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
                     Bath: {house?.bathroom}
                   </span>
 
-
-                <Link to={`/details/${house._id}`}>
-                  <button className=" border-2 border-[#eb6753] text-white bg-[#eb6753] hover:bg-white hover:text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-                    Details
-                  </button>
-                </Link>
-
+                  <Link to={`/details/${house._id}`}>
+                    <button className=" border-2 border-[#eb6753] text-white bg-[#eb6753] hover:bg-white hover:text-[#eb6753] font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
+                      Details
+                    </button>
+                  </Link>
+                </div>
+                <img
+                  className=" w-10/12 border-none def hidden absolute bottom-0 "
+                  src="https://themeholy.com/wordpress/pizzan/wp-content/themes/pizzan/assets/img/fire.png"
+                  alt=""
+                />
               </div>
-              <img
-                className=" w-10/12 border-none def hidden absolute bottom-0 "
-                src="https://themeholy.com/wordpress/pizzan/wp-content/themes/pizzan/assets/img/fire.png"
-                alt=""
-              />
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        </div>
       </div>
     );
   }

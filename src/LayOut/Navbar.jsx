@@ -2,9 +2,11 @@ import { useContext } from 'react';
 import logo from '/src/assets/header-logo.svg'
 import { AuthContext } from '../Auth/CustomAuth';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const{User, logout}= useContext(AuthContext);
+  const navigate = useNavigate()
   const handleLogout = () =>{
     Swal.fire({
       title: "Are you sure?",
@@ -17,6 +19,7 @@ const Navbar = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         logout();
+        navigate('/signin')
         Swal.fire({
           title: "Logout!",
           confirmButtonColor: "#eb6753",
@@ -28,7 +31,7 @@ const Navbar = () => {
   }
     const manuItem = (
         <>
-          <li>{User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href='/dashboard/myhouses'>DashBoard</a>:null}</li>
+          <li>{User?.userRole === "House Owner"? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href='/dashboard/myhouses'>DashBoard</a>: User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href='/dashboard/mybooking'>DashBoard</a>:null}</li>
           <li>{User? <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" onClick={handleLogout}>Log Out</a>: <a className="hover:bg-transparent hover:underline decoration-[#eb6753] px-2 text-white" href={"/signin"}>Sign in</a>}</li>
         </>
       );

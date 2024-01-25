@@ -43,7 +43,7 @@ const Dashboard = () => {
                   <li className="mb-4 ">
                   <NavLink
                     className="bg-[#eb6753] text-sm rounded-2xl px-3  py-1 text-white border-2 lg:text-base border-[#eb6753]hover:text-white lg:hover:text-[#eb6753]"
-                    to={"/dashboard/addContest"}
+                    to={"/dashboard/mybooking"}
                   >
                     My Bookings
                   </NavLink>

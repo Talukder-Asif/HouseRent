@@ -11,7 +11,10 @@ const [User, setUser] = useState(null);
 const setLocalStore =(email, role) =>{
     localStorage.setItem('email', email);
     localStorage.setItem('role', role);
-    window.location.href = "/dashboard";
+
+    role === "House Owner"?
+    window.location.href = "/dashboard/myhouses":
+    window.location.href = "/dashboard/mybooking";
 }
       // Create an Account with Email and Password
   const createUser = (email, name, phone, password, role) => {
@@ -24,7 +27,7 @@ const setLocalStore =(email, role) =>{
         password: password,
         Rent:[]
       }
-      axios.post('http://localhost:5000/user', userData)
+      axios.post('https://house-rent-server-chi.vercel.app/user', userData)
       .then(res=> res.data.insertedId?
         Swal.fire({
             icon: "success",
@@ -57,7 +60,7 @@ const setLocalStore =(email, role) =>{
   // Login with email and password
   const login = (email, password) => {
     setloading(true);
-    axios.get(`http://localhost:5000/user/${email}`)
+    axios.get(`https://house-rent-server-chi.vercel.app/user/${email}`)
     .then(res=> {
       res.data.email === email ?
         res.data.password === password ?

@@ -1,19 +1,26 @@
 import { useContext, useEffect, useState } from "react";
 
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { AuthContext } from "../../../../Auth/CustomAuth";
-import useAxios from "../../../../Hooks/useAxios";
+import axios from "axios";
 
-const MyHouse = () => {
+const MyBooking = () => {
   const { User, loading } = useContext(AuthContext);
-  const axiosPublic = useAxios();
-  const [houseData, sethouseData] = useState([]);
+  const[myDetails, setMyDetails] = useState();
+  const [reload, setReload] = useState(false);
+  const [myBooking, setMyBooking] = useState(null);
   useEffect(() => {
-    axiosPublic.get(`/dashboard/houses/${User?.userEmail}`).then((res) => {
-      res?.data.length > 0 ? sethouseData(res?.data) : null;
-    });
-  }, [User?.userEmail, axiosPublic]);
+    axios
+      .get(`https://house-rent-server-chi.vercel.app/user/${User?.userEmail}`)
+      .then((res) => res.data.Rent.length? setMyDetails(res?.data): null
+      );
+  }, [User?.userEmail, reload]);
+  
+  useEffect(() => {
+    setMyBooking(myDetails?.Rent)
+  }, [myDetails?.Rent]);
+  
+//   console.log(myBooking);
   const handelDelete = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -25,26 +32,36 @@ const MyHouse = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        axiosPublic.delete(`/house/${id}`).then((res) => {
-          if (res?.data?.acknowledged) {
+        const newRent = myBooking?.filter(p => p?.RentID !== id )
+      // Updating UserAPI
+      const updateUser = {
+        name: myDetails?.name,
+        email: myDetails?.email,
+        phone: myDetails?.phone,
+        role: myDetails?.role,
+        password: myDetails?.password,
+        Rent: newRent,
+      };
+      axios
+        .put(`https://house-rent-server-chi.vercel.app/user/${User?.userEmail}`, updateUser)
+        .then((res) => {
+          if (res.data.modifiedCount > 0) {
+            setReload(!reload)
             Swal.fire({
-              title: "Deleted!",
-              confirmButtonColor: "#eb6753",
-              text: "Your file has been deleted.",
               icon: "success",
-            });
-            sethouseData(houseData.filter((data) => data._id !== id));
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
+              title: `Request is completed`,
+              showConfirmButton: false,
+              timer: 1500,
             });
           }
         });
+
+
+        
       }
     });
   };
+
   if (loading) {
     return (
       <div className="min-h-[400px] grid content-center justify-center">
@@ -85,16 +102,16 @@ const MyHouse = () => {
                 </label>
               </th>
               <th>Name</th>
-              <th>City</th>
-              <th>Useable Btn</th>
+              <th>Owner Email</th>
+              <th>Owner Number</th>
             </tr>
           </thead>
           <tbody>
-            {houseData?.map((house, i) => (
-              <tr key={house._id}>
+            {myBooking?.map((house, i) => (
+              <tr key={i}>
                 <th>
                   <label>
-                    <p>{i + 1 }</p>
+                    <p>{i + 1}</p>
                   </label>
                 </th>
                 <td>
@@ -113,21 +130,15 @@ const MyHouse = () => {
                     </div>
                   </div>
                 </td>
-                <td>
-                  {house?.city}
-                </td>
-                <td><Link to={`/dashboard/update/${house._id}`}>
-                 <button className=" border-2 border-[#eb6753] text-white bg-[#eb6753] hover:bg-white hover:text-[#eb6753] font-medium rounded-lg text-sm px-3 py-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-                   Update
-                 </button>
-               </Link></td>
+                <td>{house?.ownerEmail}</td>
+                <td>{house?.ownerNumber}</td>
                 <th>
-                <button
-                onClick={() => handelDelete(house._id)}
-                className=" border-2 border-[#010f1c] text-white bg-[#010f1c] hover:bg-white hover:text-[#010f1c] font-medium rounded-lg text-sm px-3 py-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-              >
-                X
-              </button>
+                  <button
+                    onClick={() => handelDelete(house.RentID)}
+                    className=" border-2 border-[#010f1c] text-white bg-[#010f1c] hover:bg-white hover:text-[#010f1c] font-medium rounded-lg text-sm px-3 py-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                  >
+                    X
+                  </button>
                 </th>
               </tr>
             ))}
@@ -136,7 +147,6 @@ const MyHouse = () => {
       </div>
     );
   }
-
 };
 
-export default MyHouse;
+export default MyBooking;
